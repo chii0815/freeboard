@@ -1,0 +1,82 @@
+span.title{
+	line-height:30px;
+	font-size: 12px;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	margin:0px;
+	white-space:nowrap;
+	font-weight:bold;
+	font-style:uppercase;
+}
+.titleicon{
+	margin-right:5px;
+	color: #d3d4d4;
+}
+#devicelist{
+	margin-left: 0;
+	padding-left: 0;
+	display: inline;
+}
+#devicelist li {
+	margin-left: 0;
+	padding: 3px 15px;
+	list-style: none;
+	display: inline;
+}
+
+.led-box {
+  height: 40px;
+  width: 90px;
+  padding: 10px 0;
+  float: left;
+}
+
+.led-box p {
+  font-size: 12px;
+  text-align: center;
+  margin: 1em;
+}
+.io {
+  margin:inherit !important;
+  position: absolute !important;
+  margin-top:12px !important;
+  margin-left:9px !important;
+  z-index:10 !important;
+}
+.cw {
+  margin:10px 5px;
+}
+
+.led-red {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #F00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+}
+.led-yellow {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #FF0;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+}
+.led-green {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #ABFF00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+}
+
+.led-blue {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #24E0FF;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
+}
