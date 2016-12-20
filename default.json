@@ -1,0 +1,97 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "Devices",
+			"icon": "titleicon fa fa-microchip",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1,
+				"5": 5
+			},
+			"col": {
+				"3": 1,
+				"4": 1,
+				"5": 1
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "handlebarsWidget",
+					"settings": {
+						"helpers": "",
+						"view": "{{#each devices}}\n <div class=\"led-box\">\n     {{#if online}}\n \t<div class=\"led-blue\"></div>\n    {{else}}\n    <div class=\"led-red\"></div>\n    {{/if}}\n    <p>{{#if displayname}}{{displayname}}{{else}}{{dev}}{{/if}}</p>\n  </div>\n{{/each}}\n",
+						"model": "datasources[\"DEVs\"]",
+						"height": 1
+					}
+				}
+			]
+		},
+		{
+			"title": "Colorpicker Vitrine",
+			"icon": "titleicon fa fa-eyedropper",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 5,
+				"5": 9
+			},
+			"col": {
+				"3": 2,
+				"4": 1,
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "colorwheel",
+					"settings": {
+						"data": "datasources[\"CS\"][\"vitrine/1/rgb\"]",
+						"onLED": "led-blue",
+						"offLED": "led-red"
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"5": 1
+			},
+			"col": {
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "lightslider",
+					"settings": {
+						"data": "datasources[\"CS\"][\"vitrine/3\"]",
+						"onLED": "led-blue",
+						"offLED": "led-red"
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "CS",
+			"type": "web_socket_send",
+			"settings": {
+				"ws_uri": "wss://node-red.akiber.local:1880/ws/led"
+			}
+		},
+		{
+			"name": "DEVs",
+			"type": "web_socket_send",
+			"settings": {
+				"ws_uri": "wss://node-red.akiber.local:1880/ws/devlist"
+			}
+		}
+	],
+	"columns": 5
+}

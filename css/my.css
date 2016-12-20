@@ -43,10 +43,24 @@ span.title{
   margin-left:9px !important;
   z-index:10 !important;
 }
+.ios{
+  margin:inherit !important;
+  position: absolute !important;
+  margin-top:12px !important;
+  margin-left:9px !important;
+  z-index:10 !important;
+  top:7px !important;
+}
 .cw {
   margin:10px 5px;
 }
+.slider{
+  margin:24px 80px 10px 0px;
+  z-index:9 !important;
+  left: 65px;
+  right: 0px;
 
+}
 .led-red {
   margin: 0 auto;
   width: 24px;

@@ -1,81 +1,11 @@
 (function()
 {
-	var WebsocketSendDatasource = function(settings, updateCallback) {
-        var server = window.location.hostname;
-        var wsUri, ws;
-        var self = this;
-        var currentSettings = settings;
-        function wsStart(wsUri) {
-            ws = new WebSocket(wsUri);
-            ws.onopen = function(evt) {
-                console.log("ws_send : connected");
-				ws.send("cfg");
-            };
-            ws.onclose = function(evt) {
-                console.log("ws_send : disconnected");
-                setTimeout(function(){wsStart(wsUri)}, 3000); // try to reconnect every 3 secs...
-            }
-            ws.onmessage = function (evt) {
-                try {
-                    var da = JSON.parse(evt.data);
-                    updateCallback(da);
-                } catch (e) {
-                    // console.log("ws_send : bad parse",evt.data);
-                }
-            }
-            ws.onerror = function(evt) {
-                console.log("ws_send : error",evt);
-            }
-        }
-		this.sendvalues = function(value){
-			//if(ws.readyState == 1){
-				ws.send(value);
-			//}
-			// console.log("ws_send",value);
-		}
-        this.updateNow = function() {
-            console.log("ws_send: Update now");
-			if(ws.readyState == 1){
-				ws.send("cfg");
-			}
-        }
-        this.onDispose = function() {
-            // console.log("ws_send: Disposed");
-        }
-        this.onSettingsChanged = function(newSettings) {
-            if (ws) ws.close();
-            currentSettings = newSettings;
-            wsUri = currentSettings.ws_uri;
-            wsStart(wsUri);
-        }
-        self.onSettingsChanged(settings);
-    };
-    freeboard.loadDatasourcePlugin({
-        type_name : "web_socket_send",
-        display_name: "Web Socket with sending",
-        settings : [
-            {
-                name : "ws_uri",
-                display_name: "WS URI",
-                description : "Example: ws://server:port/path",
-                type : "text"
-            }
-        ],
-        newInstance : function(settings, newInstanceCallback, updateCallback)
-        {
-            newInstanceCallback(new WebsocketSendDatasource(settings, updateCallback));
-        }
-    });
 	freeboard.loadWidgetPlugin({
 		// Same stuff here as with datasource plugin.
-		"type_name"   : "colorwheel",
-		"display_name": "Colorwheel",
-        "description" : "Colorwheel",
+		"type_name"   : "lightslider",
+		"display_name": "Light Slider",
+        "description" : "Slider for Light",
 		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
-		"external_scripts": [
-			"plugins/thirdparty/raphael.2.1.0.min.js",
-			"plugins/thirdparty/colorwheel.js"
-		],
 		// **fill_size** : If this is set to true, the widget will fill be allowed to fill the entire space given it, otherwise it will contain an automatic padding of around 10 pixels around it.
 		"fill_size" : true,
 		"settings"    : [
@@ -136,46 +66,35 @@
 		// Same as with datasource plugin, but there is no updateCallback parameter in this case.
 		newInstance   : function(settings, newInstanceCallback)
 		{
-			newInstanceCallback(new ColorwheelPlugin(settings));
+			newInstanceCallback(new SliderPlugin(settings));
 		}
 	});
-	var ColorwheelPlugin = function(settings){
+	var SliderPlugin = function(settings){
 		var self = this;
 		var currentSettings = settings;
-		var colors = [0,0,0,0];
+		var light = 0;
 		var isOn = false;
 		var colorset = "";
 		// Here we create an element to hold the text we're going to display. We're going to set the value displayed in it below.
-		var led = $('<div class="io"></div>');
-		var wheel = $('<div class="cw"></div>');
-		var cw = Raphael.colorwheel(wheel, 290, 120);
-		cw.onchange(function(color){
-			colors = [parseInt(color.r), parseInt(color.g), parseInt(color.b),0];
-			var o = isOn ? 1: 0;
-			var msg ="set,"+colorset+","+o+","+colors.join(",");
-			self.sendValue(currentSettings.data, msg);
-		});
+		var led = $('<div class="ios"></div>');
+		var slider = $('<div class="slider"></div>');
 		this.onoff = function(e){
 				e.preventDefault()
 				isOn = !isOn;
 				var o = isOn ? 1: 0;
-				var msg ="set,"+colorset+","+o+","+colors.join(",");
+				var msg ="set,"+colorset+","+o+",0,0,0,"+light;
 				this.sendValue(currentSettings.data, msg);
 				led.toggleClass(currentSettings.onLED).toggleClass(currentSettings.offLED);				
 		}
-		
-		function updateState(){
-		//	console.log("cw: ",isOn);
-		//	console.log("cw_colors: ", colors);
+		 function updateState(){
 			if(isOn){
 				led.addClass(currentSettings.onLED);
 			} else {
 				led.addClass(currentSettings.offLED);
 			}
-			var col = "#" + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).slice(1);
-			cw.color(col);
-			//console.log("cw_colstr: ",col);
-		}
+			$(slider).slider("value", light);
+			//console.log(light);
+		 }
 		
 		
 		// **render(containerElement)** (required) : A public function we must implement that will be called when freeboard wants us to render the contents of our widget. The container element is the DIV that will surround the widget.
@@ -183,7 +102,18 @@
 		{
 			// Here we append our text element to the widget container element.
 			$(containerElement).append(led);
-			$(containerElement).append(wheel);
+			$(containerElement).append(slider);
+			$(slider).slider({
+				range: "min",
+				min: 1,
+				max: 255,
+				slide: function(event, ui){
+					light = ui.value;
+					var o = isOn ? 1: 0;
+					var msg ="set,"+colorset+","+o+",0,0,0,"+light;
+					self.sendValue(currentSettings.data, msg);
+				}
+			});
 			$(led).click(this.onoff.bind(this));
 		
 		}
@@ -195,7 +125,7 @@
 		// Blocks of different sizes may be supported in the future.
 		this.getHeight = function()
 		{
-			return 5;
+			return 1;
 		}
 
 		// **onSettingsChanged(newSettings)** (required) : A public function we must implement that will be called when a user makes a change to the settings.
@@ -211,12 +141,9 @@
 			// Remember we defined "the_text" up above in our settings.
 			if(settingName == "data")
 			{
-				//console.log("cw:", newValue);
-				colors = [parseInt(newValue.red),parseInt(newValue.green),parseInt(newValue.blue),parseInt(newValue.white)];
+				//console.log("sl: ",newValue);
+				light = parseInt(newValue.white);
 				isOn = Boolean(parseInt(newValue.on));
-				//var values = newValue.payload.split(',');
-				//colors = [parseInt(values[1]),parseInt(values[2]),parseInt(values[3])];
-				//isOn = Boolean(parseInt(values[0]));
 				colorset = newValue.colorset;
 			}
 			updateState();
